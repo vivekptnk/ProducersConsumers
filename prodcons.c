@@ -2,6 +2,7 @@
 #include <stdlib.h> // for rand
 #include <unistd.h> // for usleep
 #include <assert.h>
+#include <semaphore.h>
 
 /* Global variables,
 -----------------------------------------------------------------------------*/
@@ -14,6 +15,14 @@ int n_empty=0; // Count the number of times the buffer is empty
 int n_tot_cons=0; // Count the total number of items consumed
 int n_tot_prod=0; // Count the total number of items produced
 int trace=0; // provide more detailed information if 1
+
+// my declarations
+int waittime = 100
+
+typedef int semaphore;
+semaphore mutex = 1;
+semaphore avail = BUFSIZE;
+semaphore used - 0;
 
 /* Function Declarations
 -----------------------------------------------------------------------------*/
@@ -38,6 +47,8 @@ int main(int argc,char **argv) {
 
 
 	/* TODO: Start producer and consumer */
+	producer();
+	consumer();
 
 	/* Sleep long enough to see what happens*/
 	sleep(5); // wait for 5 seconds
@@ -82,21 +93,43 @@ int remove_item() {
 
 /* producer function
 -----------------------------------------------------------------------------*/
-void producer(void){
+void producer(waittime){
+	printf("Starting up!!");
 	int item;
+	int sleeptime;
 	while(TRUE){
-		item = 
+		item = rand()%100;
+		sem_wait(&avail);
+		sem_wait(&mutex);
+		insert_item(item);
+		sem_post(&mutex);
+		sem_post(&used);
+		
+		sleeptime = rand()%(2*waittime);
+		usleep(sleeptime);
+		
+		
+			
 	}
 }
 
 
-
-
-
 /* consumer function 
 -----------------------------------------------------------------------------*/
-
-
+void consumer(waittime){
+	printf("Starting up!!");
+	int sleeptime;
+	while(TRUE){
+		sem_wait(&used);
+		sem_wait(&mutex);
+		remove_item();
+		sem_post(&mutex);
+		sem_post(&avail);
+		
+		sleeptime = rand()%(2*waittime);
+		usleep(sleeptime);
+	}	
+}
 
 
 
