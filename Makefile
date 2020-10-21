@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-ggdb -Wall -lpthread
+CFLAGS=-ggdb -Wall -pthread
 
 test : prodcons
 	date > results.txt

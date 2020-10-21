@@ -3,6 +3,7 @@
 #include <unistd.h> // for usleep
 #include <assert.h>
 #include <semaphore.h>
+#include <pthread.h>
 
 /* Global variables,
 -----------------------------------------------------------------------------*/
@@ -17,17 +18,17 @@ int n_tot_prod=0; // Count the total number of items produced
 int trace=0; // provide more detailed information if 1
 
 // my declarations
-int waittime = 100
 
-typedef int semaphore;
-semaphore mutex = 1;
-semaphore avail = BUFSIZE;
-semaphore used - 0;
+sem_t avail;
+sem_t used;
+pthread_mutex_t mutex;
 
 /* Function Declarations
 -----------------------------------------------------------------------------*/
 void insert_item(int newVal); // Push new value onto cpBuffer
 int remove_item(); // Retrieve and return value from cpBuffer
+void* producer(void* args);
+void* consumer(void* args);
 
 
 /* Main function
@@ -47,14 +48,27 @@ int main(int argc,char **argv) {
 
 
 	/* TODO: Start producer and consumer */
-	producer();
-	consumer();
+	pthread_t prod, cons;
+	int waittime = 100;
+	pthread_mutex_init(&mutex, NULL);
+	sem_init(&avail, 0, BUFSIZE);
+	sem_init(&used, 0, 0);
+	 
+	if (pthread_create(&prod, NULL, producer, &waittime) != 0 ){printf("Failed");};
+	pthread_create(&cons, NULL, consumer, &waittime);
+	
 
 	/* Sleep long enough to see what happens*/
 	sleep(5); // wait for 5 seconds
 	times_up=1; // Tell producer and consumer that time is up
 
 	/* TODO: close/clean up after producer and consumer */
+	pthread_join(prod,NULL);
+	pthread_join(cons,NULL);
+	
+	pthread_mutex_destroy(&mutex);
+	sem_destroy(&avail);
+	sem_destroy(&used);
 
 	printf("Produced a total of %d items and consumed %d items\n",n_tot_prod,n_tot_cons);
 	printf("Buffer was empty %d times, and full %d times\n",n_empty,n_full);
@@ -93,42 +107,51 @@ int remove_item() {
 
 /* producer function
 -----------------------------------------------------------------------------*/
-void producer(waittime){
+void* producer(void* args){
 	printf("Starting up!!");
+	int waittime = *((int*)args);
 	int item;
 	int sleeptime;
-	while(TRUE){
+	while(times_up == 0){
 		item = rand()%100;
 		sem_wait(&avail);
-		sem_wait(&mutex);
+		
+		pthread_mutex_lock(&mutex);
 		insert_item(item);
-		sem_post(&mutex);
+		pthread_mutex_unlock(&mutex);
+		
 		sem_post(&used);
 		
 		sleeptime = rand()%(2*waittime);
 		usleep(sleeptime);
-		
-		
+
 			
 	}
+	
+	return NULL;
 }
 
 
 /* consumer function 
 -----------------------------------------------------------------------------*/
-void consumer(waittime){
+void* consumer(void* args){
 	printf("Starting up!!");
+	int waittime = *((int*)args);
 	int sleeptime;
-	while(TRUE){
+	while(times_up == 0){
 		sem_wait(&used);
-		sem_wait(&mutex);
+		
+		pthread_mutex_lock(&mutex);
 		remove_item();
-		sem_post(&mutex);
+		pthread_mutex_lock(&mutex);
+		
 		sem_post(&avail);
 		
 		sleeptime = rand()%(2*waittime);
 		usleep(sleeptime);
 	}	
+	
+	return NULL;
 }
 
 
