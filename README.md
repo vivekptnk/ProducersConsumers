@@ -1,4 +1,4 @@
-# Producers-Consumers-Problems
+# Producers Consumers Problem (Multi-Thread Programming)
 Solution for the multithreaded Producer Consumers problem using semaphores and mutexes. Instructions provided by THOMAS BARTENSTEIN, instructor, CS311, Binghamton University.
 
 ## Global Variables
