@@ -80,3 +80,12 @@ Builds the prodcons program with tracing turned on.
 
 #### clean
 Removes the files that Makefile created
+
+## Testing 
+Run your command with trace on until you get the mutexes and semaphores working correctly. Then, turn off tracing. Run with the default wait times for producer and consumer, both 100 milliseconds. The buffer may be full or empty a small number of times, but since the producer and consumer are producing and consuming at a relatively equal rate, the buffer should be partly filled almost all the time.
+
+Try making the consumer run significantly slower than the producer, e.g. ./prodcons 50 5000. Now, the buffer should be full almost all the time. 
+
+Then switch... run the producer slow and the consumer fast, e.g. ./prodcons 5000 50.
+
+Don't forget to run under valgrind. The checkMem target in the Makefile shows how we will run valgrind to check your program.
