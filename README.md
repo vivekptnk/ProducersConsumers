@@ -89,3 +89,7 @@ Try making the consumer run significantly slower than the producer, e.g. ./prodc
 Then switch... run the producer slow and the consumer fast, e.g. ./prodcons 5000 50.
 
 Don't forget to run under valgrind. The checkMem target in the Makefile shows how we will run valgrind to check your program.
+
+## Project Status
+Finished
+
